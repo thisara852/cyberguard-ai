@@ -32,29 +32,3 @@ Double-click `run_server.bat` or run in terminal:
 ```powershell
 .venv\Scripts\activate
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-```
-
-### 3. Accessing the SOC Dashboard & API
-- **Interactive SOC Dashboard**: Open [http://localhost:8000](http://localhost:8000)
-- **Interactive OpenAPI Documentation**: Open [http://localhost:8000/docs](http://localhost:8000/docs)
-
-### 4. Default Seeded Accounts
-| Role | Username | Password | Access Level |
-| :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin` | `Admin@123` | Full access, settings, retraining, response authorization |
-| **Security Analyst** | `analyst` | `Analyst@123` | Alert triage, incident escalation, response playbooks |
-| **Operator** | `operator` | `Operator@123` | Read-only telemetry, events viewing |
-
-### 5. Running the Live Attack Simulator
-Open a second terminal and run:
-```powershell
-.venv\Scripts\activate
-python simulation_runner.py
-```
-Watch the SOC dashboard update live with real-time alerts, attack paths, and risk scores!
-
-### 6. Running Automated Tests
-```powershell
-.venv\Scripts\activate
-python -m pytest tests/ -v
-```
