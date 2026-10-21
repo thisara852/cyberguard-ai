@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberGuard AI – Security Operations Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/soc.css">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-shield">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>CyberGuard AI</h1>
+        <p>Autonomous Threat Intelligence Platform</p>
+      </div>
+    </div>
+
+    <div class="header-status">
+      <button class="btn btn-primary" id="btnSimulateAttack" onclick="triggerSimulatedAttack()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        Simulate Attack
+      </button>
+
+      <div class="live-indicator" id="wsStatus">
+        <div class="pulse-dot"></div>
+        <span id="wsStatusText">SOC REAL-TIME: CONNECTED</span>
+      </div>
+
+      <div class="user-badge">
+        <span id="headerUsername">admin</span>
+        <span class="role-tag" id="headerRole">Super Admin</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Body Layout -->
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="nav-item active" onclick="switchTab('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Overview Dashboard
+      </div>
+      <div class="nav-item" onclick="switchTab('events')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+        Live Security Events
+      </div>
+      <div class="nav-item" onclick="switchTab('ml')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        AI Threat Detection
+      </div>
+      <div class="nav-item" onclick="switchTab('scanners')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+        Phishing & Malware
+      </div>
+      <div class="nav-item" onclick="switchTab('incidents')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        Incidents & Response
+      </div>
+      <div class="nav-item" onclick="switchTab('visualization')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+        Attack Topology Graph
+      </div>
+      <div class="nav-item" onclick="switchTab('assistant')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        AI Security Copilot
+      </div>
+      <div class="nav-item" onclick="switchTab('mlops')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+        MLOps & Model Drift
+      </div>
+      <div class="nav-item" onclick="switchTab('admin')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14h-2v-2h2zm0-4h-2V7h2z"></path></svg>
+        Audit & Admin
+      </div>
+    </aside>
+
+    <!-- Main Content Panels -->
+    <main class="main-content">
+
+      <!-- 1. DASHBOARD OVERVIEW -->
+      <section id="section-dashboard" class="page-section active">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Security Operations Center Dashboard</h2>
+            <p class="section-desc">Unified real-time threat intelligence and automated risk posture monitoring</p>
+          </div>
+          <div>
+            <button class="btn btn-secondary" onclick="refreshDashboard()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              Refresh Telemetry
+            </button>
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-title">Security Posture Score</div>
+            <div class="metric-value">
+              <span id="valPosture">92</span><span style="font-size: 16px; color: var(--text-muted);">/100</span>
+            </div>
+            <div class="risk-meter-container">
+              <div class="risk-meter-fill" id="meterPosture" style="width: 92%; background: var(--success);"></div>
+            </div>
+            <div class="metric-sub" id="subPosture">Network Perimeter Stable</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-title">Active Threats & Alerts</div>
+            <div class="metric-value" id="valAlerts">14</div>
+            <div class="metric-sub">
+              <span class="badge-critical" id="cntCritical">2 Critical</span>
+              <span class="badge-high" id="cntHigh">4 High</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-title">Monitored Assets</div>
+            <div class="metric-value" id="valAssets">8</div>
+            <div class="metric-sub">Protected Endpoints & Servers</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-title">Open Incidents</div>
+            <div class="metric-value" id="valIncidents">3</div>
+            <div class="metric-sub">Under Active Triage</div>
+          </div>
+        </div>
+
+        <!-- Alerts Table & Recent Incidents -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Real-Time Security Alerts Stream</h3>
+            <span class="badge-critical" id="alertStreamBadge">LIVE STREAM</span>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Threat Category</th>
+                <th>Severity</th>
+                <th>Source IP</th>
+                <th>Target Asset</th>
+                <th>Risk</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="alertsTableBody">
+              <tr>
+                <td colspan="8" style="text-align: center; color: var(--text-muted);">Loading live alerts...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 2. LIVE EVENTS -->
+      <section id="section-events" class="page-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Normalized Security Event Stream</h2>
+            <p class="section-desc">Continuous ingestion, normalization, and packet-level telemetry (FR-06 to FR-09)</p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="generateSampleEvents(30)">Generate 30 Events</button>
+            <button class="btn btn-secondary" onclick="loadEvents()">Refresh</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Source $\to$ Target</th>
+                <th>Proto / Svc</th>
+                <th>Packets / Bytes</th>
+                <th>Flags</th>
+                <th>Category</th>
+              </tr>
+            </thead>
+            <tbody id="eventsTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted);">No events loaded</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3. ML THREAT DETECTION SANDBOX -->
+      <section id="section-ml" class="page-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Machine Learning Inference & Anomaly Engine</h2>
+            <p class="section-desc">Supervised Intrusion Detection + Unsupervised Isolation Forest (FR-10, FR-11)</p>
+          </div>
+          <button class="btn btn-secondary" onclick="retrainModel()">Trigger Model Retraining (FR-50)</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div class="panel">
+            <h3 class="panel-title" style="margin-bottom: 16px;">Test Network Event Payload</h3>
+            <div class="form-group">
+              <label class="form-label">Source IP</label>
+              <input type="text" class="form-input" id="mlSrcIp" value="185.220.101.5">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Destination IP</label>
+              <input type="text" class="form-input" id="mlDstIp" value="192.168.1.10">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label class="form-label">Dest Port</label>
+                <input type="number" class="form-input" id="mlDstPort" value="80">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Protocol</label>
+                <select class="form-select" id="mlProto">
+                  <option value="TCP">TCP</option>
+                  <option value="UDP">UDP</option>
+                  <option value="ICMP">ICMP</option>
+                </select>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label class="form-label">Packets</label>
+                <input type="number" class="form-input" id="mlPackets" value="2">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Bytes Sent</label>
+                <input type="number" class="form-input" id="mlBytes" value="60">
+              </div>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="runMLInference()">
+              Run AI Prediction Pipeline
+            </button>
+          </div>
+
+          <div class="panel">
+            <h3 class="panel-title" style="margin-bottom: 16px;">Detection Output & Explainability</h3>
+            <div id="mlResultBox" style="font-size: 13.5px; line-height: 1.6; color: var(--text-secondary);">
+              Run prediction on the left to evaluate event through Random Forest, Isolation Forest, and AI Risk Engine.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. PHISHING & MALWARE SCANNERS -->
+      <section id="section-scanners" class="page-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Specialized Threat Intelligence Scanners</h2>
+            <p class="section-desc">Lexical Phishing Detection & PE Malware Metadata Analysis (FR-14, FR-15)</p>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <!-- Phishing Scanner -->
+          <div class="panel">
+            <h3 class="panel-title" style="margin-bottom: 14px;">Phishing URL Heuristic Scanner (FR-14)</h3>
+            <div class="form-group">
+              <label class="form-label">URL to Inspect</label>
+              <input type="text" class="form-input" id="phishUrlInput" value="http://192.168.1.100/account-verify-login.php">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="scanPhishingURL()">Scan URL</button>
+            <div id="phishResult" style="margin-top: 16px; font-size: 13px;"></div>
+          </div>
+
+          <!-- Malware Scanner -->
+          <div class="panel">
+            <h3 class="panel-title" style="margin-bottom: 14px;">Malware Metadata Analyzer (FR-15)</h3>
+            <div class="form-group">
+              <label class="form-label">File Name</label>
+              <input type="text" class="form-input" id="malFilename" value="invoice_scan.pdf.exe">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Section Entropy (0 - 8)</label>
+              <input type="number" step="0.1" class="form-input" id="malEntropy" value="7.6">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Imported Suspicious APIs</label>
+              <input type="text" class="form-input" id="malImports" value="VirtualAllocEx, WriteProcessMemory">
+            </div>
+            <button class="btn btn-danger" style="width: 100%;" onclick="scanMalwareMetadata()">Inspect File Payload</button>
+            <div id="malResult" style="margin-top: 16px; font-size: 13px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. INCIDENTS & RESPONSE -->
+      <section id="section-incidents" class="page-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Incident Command & Response Center</h2>
+            <p class="section-desc">Lifecycle tracking, evidence chronological timeline, and containment playbooks (FR-23 to FR-28, FR-40)</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Incident ID</th>
+                <th>Title</th>
+                <th>Severity</th>
+                <th>Status</th>
+                <th>Assigned To</th>
+                <th>Risk Score</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="incidentsTableBody">
+              <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading incidents...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="incidentDetailPanel" class="panel" style="display: none;">
+          <div class="panel-header">
+            <h3 class="panel-title" id="incDetailTitle">Incident Timeline & Evidence Locker</h3>
+            <button class="btn btn-secondary" onclick="document.getElementById('incidentDetailPanel').style.display='none'">Close</button>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div>
+              <h4 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);">Chronological Timeline</h4>
+              <div class="timeline-container" id="incTimelineList"></div>
+            </div>
+            <div>
+              <h4 style="font-size: 14px; margin-bottom: 12px; color: var(--text-secondary);">Simulated Response Playbooks (FR-40)</h4>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn btn-danger" onclick="executeIncidentPlaybook('BLOCK_IP')">Simulate Block Attacker IP</button>
+                <button class="btn btn-secondary" onclick="executeIncidentPlaybook('ISOLATE_DEVICE')">Simulate Isolate Host VLAN</button>
+                <button class="btn btn-secondary" onclick="executeIncidentPlaybook('DISABLE_USER')">Simulate Lock Compromised Account</button>
+                <button class="btn btn-secondary" onclick="executeIncidentPlaybook('QUARANTINE_FILE')">Simulate File Hash Quarantine</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. ATTACK TOPOLOGY GRAPH -->
+      <section id="section-visualization" class="page-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Attack Path & Topology Visualizer</h2>
+            <p class="section-desc">Interactive graph mapping adversary source IPs to firewall gateways and compromised internal assets (FR-36)</p>
+          </div>
+          <button class="btn btn-secondary" onclick="loadAttackGraph()">Refresh Topology</button>
+        </div>
+
+        <div class="panel">
+          <div class="canvas-container">
+            <canvas id="attackCanvas"></canvas>
+          </div>
+          <div style="margin-top: 14px; font-size: 12.5px; color: var(--text-secondary); display: flex; gap: 20px;">
+            <div><span style="color: var(--danger);">●</span> Adversary Source IP</div>
+            <div><span style="color: var(--accent-cyan);">■</span> Firewall / Edge Gateway</div>
+            <div><span style="color: var(--warning);">▲</span> Targeted Internal Asset</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. AI SECURITY COPILOT -->
+      <section id="section-assistant" class="page-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">CyberGuard AI Security Assistant</h2>
+            <p class="section-desc">Natural language SOC copilot for threat summarization and triage guidance (FR-37, FR-38)</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="chat-box">
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-bubble ai">
+                Greetings Analyst. I am your <strong>CyberGuard AI Assistant</strong>. You can ask me:
+                <br>• <em>"Summarize recent incidents"</em>
+                <br>• <em>"Why does asset 192.168.1.10 have a high risk score?"</em>
+                <br>• <em>"What active threat vectors are currently detected?"</em>
+              </div>
+            </div>
+            <div class="chat-input-row">
+              <input type="text" class="form-input" id="chatInput" placeholder="Ask AI Security Copilot..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+              <button class="btn btn-primary" onclick="sendChatMessage()">Send</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. MLOPS & MODEL DRIFT -->
+      <section id="section-mlops" class="page-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">MLOps Model Monitoring & Governance</h2>
+            <p class="section-desc">Track model latency, error rates, Population Stability Index (PSI), and data drift (FR-48, FR-49)</p>
+          </div>
+          <button class="btn btn-secondary" onclick="loadMLOpsHealth()">Refresh Telemetry</button>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-title">Model Health Status</div>
+            <div class="metric-value" style="color: var(--success);" id="mlopsStatus">HEALTHY</div>
+            <div class="metric-sub" id="mlopsModelName">CyberGuard-RandomForest v1.0.0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Avg Latency</div>
+            <div class="metric-value"><span id="mlopsLatency">42.5</span><span style="font-size: 16px;">ms</span></div>
+            <div class="metric-sub">NFR-01 Target: &lt; 3000ms</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Data Drift Score (PSI)</div>
+            <div class="metric-value" id="mlopsDrift">0.05</div>
+            <div class="metric-sub">Drift Threshold: 0.25</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Evaluated Inferences</div>
+            <div class="metric-value" id="mlopsTotal">1,420</div>
+            <div class="metric-sub">Production Invocations</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. AUDIT & ADMIN -->
+      <section id="section-admin" class="page-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Security Administration & Audit Trail</h2>
+            <p class="section-desc">Immutable audit logs and role configuration (FR-03, FR-42, FR-55)</p>
+          </div>
+          <button class="btn btn-secondary" onclick="loadAuditLogs()">Refresh Audit Trail</button>
+        </div>
+
+        <div class="panel">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Operator</th>
+                <th>Action</th>
+                <th>Resource Type</th>
+                <th>Details</th>
+                <th>IP Address</th>
+              </tr>
+            </thead>
+            <tbody id="auditLogsBody">
+              <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading audit logs...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="/static/soc.js"></script>
+</body>
+</html>
